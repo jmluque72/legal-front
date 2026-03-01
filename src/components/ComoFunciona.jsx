@@ -1,25 +1,11 @@
+import { Link } from 'react-router-dom'
+
 export default function ComoFunciona() {
   const steps = [
-    {
-      num: 1,
-      title: 'Evaluación inicial',
-      desc: 'Analiza viabilidad legal, urgencia sanitaria y vía más adecuada. Evita litigios innecesarios, acelera los urgentes.',
-    },
-    {
-      num: 2,
-      title: 'Derivación al módulo',
-      desc: 'Cada caso va al circuito que le corresponde, no a una bolsa genérica. 7 módulos especializados.',
-    },
-    {
-      num: 3,
-      title: 'Acompañamiento',
-      desc: 'Ordena documentación, define estrategia, controla plazos y supervisa el cumplimiento efectivo.',
-    },
-    {
-      num: 4,
-      title: 'Cierre trazable',
-      desc: 'Todo queda registrado, medido y auditable. Nada librado al azar.',
-    },
+    { num: 1, title: 'Ingresás tu caso', desc: 'Completás un recorrido guiado con tu situación médica, el conflicto y la documentación disponible.' },
+    { num: 2, title: 'Evaluación Integral Multidimensional', desc: 'El sistema analiza viabilidad legal, urgencia sanitaria y vía más adecuada.' },
+    { num: 3, title: 'Informe estructurado', desc: 'Recibís un informe claro con nivel de viabilidad, urgencia y recomendación estratégica.' },
+    { num: 4, title: 'Decisión con claridad', desc: 'Con la información en mano, podés decidir los próximos pasos con fundamento.' },
   ]
 
   return (
@@ -29,7 +15,7 @@ export default function ComoFunciona() {
       </div>
       <section className="landing-como">
         <p className="landing-como-intro">
-          Todo queda registrado, medido y auditable — nada queda librado al azar.
+          Un recorrido simple para que tu situación sea evaluada con rigor técnico.
         </p>
         <div className="landing-como-steps">
           {steps.map((step) => (
@@ -43,6 +29,9 @@ export default function ComoFunciona() {
               <p className="step-desc">{step.desc}</p>
             </div>
           ))}
+        </div>
+        <div className="landing-como-cta">
+          <Link to="/evaluar" className="btn-primary">Evaluar mi caso</Link>
         </div>
       </section>
     </>

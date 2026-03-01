@@ -4,17 +4,14 @@ export default function CtaFinal() {
   return (
     <section className="landing-cta">
       <div className="landing-cta-inner">
-        <h2>NexoSalud Legal no promete milagros.</h2>
-        <p className="landing-cta-sub">Promete algo más importante:</p>
-        <p className="landing-cta-tag">
-          Orden, criterio y humanidad en los conflictos de salud.
-        </p>
+        <h2>No tomes decisiones sin información clara.</h2>
         <p className="landing-cta-note">
-          Porque cuando la salud está en juego, el derecho no puede llegar tarde.
+          Evaluamos técnicamente tu situación para que sepas cuál es el mejor camino.
         </p>
-        <Link to="/mala-praxis" className="btn-cta">
-          Conversemos — NexoSalud Legal está lista para su primer piloto.
+        <Link to="/evaluar" className="btn-cta">
+          Evaluar mi caso ahora
         </Link>
+        <p className="landing-cta-micro">Proceso confidencial y profesional.</p>
       </div>
     </section>
   )

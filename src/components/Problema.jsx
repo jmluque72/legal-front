@@ -1,22 +1,20 @@
 export default function Problema() {
   const cards = [
-    { text: 'Una obra social niega un tratamiento urgente', bar: 'navy' },
-    { text: 'Un medicamento crítico no llega a tiempo', bar: 'navy' },
-    { text: 'Un adulto mayor queda desprotegido', bar: 'navy' },
-    { text: 'Una familia no sabe si iniciar una acción judicial', bar: 'green' },
-    { text: 'Un caso llega tarde, mal documentado y en estado crítico', bar: 'green' },
+    { text: 'Negativas de cobertura', bar: 'navy' },
+    { text: 'Conflictos médicos complejos', bar: 'navy' },
+    { text: 'Falta de claridad legal', bar: 'navy' },
   ]
 
   return (
     <>
       <div className="section-header" id="problema">
-        <h2>El Problema</h2>
+        <h2>Cuando la salud se vuelve un conflicto…</h2>
       </div>
       <section className="landing-problema">
         <p className="landing-problema-intro">
-          Todos los días, personas enfrentan situaciones como estas:
+          Situaciones que podemos ayudarte a evaluar con criterio técnico:
         </p>
-        <div className="landing-problema-grid">
+        <div className="landing-problema-grid landing-problema-grid--three">
           {cards.map((card, i) => (
             <div key={i} className="landing-problema-card">
               <div className={`bar ${card.bar === 'green' ? 'green' : ''}`} />
@@ -28,8 +26,8 @@ export default function Problema() {
           ))}
         </div>
         <div className="landing-problema-close">
-          <p>El problema no es solo legal. Es médico, ético, humano y estructural.</p>
-          <p className="green">NexoSalud Legal nace para ordenar ese caos.</p>
+          <p>El objetivo: que te identifiques con el escenario sin dramatismo. Evaluamos con seriedad.</p>
+          <p className="green">NexoSalud Legal ordena la información para que decidas con claridad.</p>
         </div>
       </section>
     </>

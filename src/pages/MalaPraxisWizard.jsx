@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import { es } from 'date-fns/locale'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -126,7 +126,11 @@ function serializeForApi(data) {
   return out
 }
 
-export default function MalaPraxisWizard() {
+export default function MalaPraxisWizard({ fromEvaluar = false }) {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const anexoFromState = location.state?.anexo
+  const tipologiaFromState = location.state?.tipologia
   const [data, setData] = useState(initialData)
   const [step, setStep] = useState(0)
   const [errors, setErrors] = useState({})
@@ -205,6 +209,10 @@ export default function MalaPraxisWizard() {
     setSubmitError(null)
     try {
       const payload = serializeForApi(data)
+      if (fromEvaluar) {
+        payload.tipologia = tipologiaFromState || 'evento_medico_adverso'
+        payload.anexo = anexoFromState || 'V'
+      }
       const res = await fetch(`${API_URL}/requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -215,8 +223,13 @@ export default function MalaPraxisWizard() {
         setSubmitError(json.error || `Error ${res.status}`)
         return
       }
-      setCaseId(json.caseId ?? null)
-      setSubmitSuccess(true)
+      const newCaseId = json.caseId ?? null
+      setCaseId(newCaseId)
+      if (fromEvaluar) {
+        navigate('/evaluar/procesando', { state: { caseId: newCaseId } })
+      } else {
+        setSubmitSuccess(true)
+      }
     } catch (err) {
       setSubmitError(err.message || 'Error de conexión')
     } finally {
@@ -263,8 +276,8 @@ export default function MalaPraxisWizard() {
   return (
     <div className="wizard">
       <header className="wizard-header">
-        <Link to="/" className="wizard-back">← Volver</Link>
-        <h1>Consulta por mala praxis</h1>
+        <Link to={fromEvaluar ? "/evaluar/tipo-caso" : "/"} className="wizard-back">← Volver</Link>
+        <h1>{fromEvaluar ? 'Evaluación de Evento Médico Adverso' : 'Consulta por mala praxis'}</h1>
         <div className="wizard-actions-top">
           <button type="button" className="wizard-btn secondary" onClick={handleLlenarTodo}>
             Llenar todo
@@ -290,7 +303,7 @@ export default function MalaPraxisWizard() {
             </p>
           )}
           <p>Hemos registrado su consulta. En breve alguien se pondrá en contacto para informarle sobre el caso.</p>
-          <Link to="/" className="wizard-btn primary">Volver al inicio</Link>
+          <Link to={fromEvaluar ? "/evaluar/tipo-caso" : "/"} className="wizard-btn primary">Volver al inicio</Link>
         </div>
       ) : (
       <form onSubmit={handleSubmit} className="wizard-form">
