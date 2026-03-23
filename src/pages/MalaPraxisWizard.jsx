@@ -151,14 +151,16 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
     const e = {}
     if (s === 0) {
       if (!data.rol_solicitante) e.rol_solicitante = 'Requerido'
-      if (!data.nombre_completo?.trim()) e.nombre_completo = 'Requerido'
-      if (!data.documento?.trim()) e.documento = 'Requerido'
-      if (!/^\d{7,8}$/.test(data.documento?.replaceAll(/\D/g, ''))) e.documento = 'DNI 7 u 8 dígitos'
-      if (!data.email?.trim()) e.email = 'Requerido'
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) e.email = 'Email inválido'
-      if (!data.telefono?.trim()) e.telefono = 'Requerido'
-      if (!data.jurisdiccion) e.jurisdiccion = 'Requerido'
       if (showForm2 && !data.vinculo?.trim()) e.vinculo = 'Requerido'
+      if (!desdeRegistrado) {
+        if (!data.nombre_completo?.trim()) e.nombre_completo = 'Requerido'
+        if (!data.documento?.trim()) e.documento = 'Requerido'
+        if (!/^\d{7,8}$/.test(data.documento?.replaceAll(/\D/g, ''))) e.documento = 'DNI 7 u 8 dígitos'
+        if (!data.email?.trim()) e.email = 'Requerido'
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) e.email = 'Email inválido'
+        if (!data.telefono?.trim()) e.telefono = 'Requerido'
+        if (!data.jurisdiccion) e.jurisdiccion = 'Requerido'
+      }
     }
     if (s === 1 && showForm2) {
       if (!data.paciente_edad && data.paciente_edad !== 0) e.paciente_edad = 'Requerido'
@@ -202,6 +204,9 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
     setStep((s) => getPrevStep(s, data))
   }
 
+  const desdeRegistrado = location.state?.desdeRegistrado
+  const caseIdExistente = location.state?.caseId
+
   const handleSubmit = async (ev) => {
     ev.preventDefault()
     if (!validateStep(6)) return
@@ -213,6 +218,25 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
         payload.tipologia = tipologiaFromState || 'evento_medico_adverso'
         payload.anexo = anexoFromState || 'V'
       }
+
+      if (desdeRegistrado && caseIdExistente) {
+        const omitBasicos = ['nombre_completo', 'documento', 'email', 'telefono', 'jurisdiccion']
+        const payloadAnexo = Object.fromEntries(Object.entries(payload).filter(([k]) => !omitBasicos.includes(k)))
+        const res = await fetch(`${API_URL}/requests/${caseIdExistente}/datos`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payloadAnexo)
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          setSubmitError(json.error || `Error ${res.status}`)
+          return
+        }
+        setCaseId(caseIdExistente)
+        navigate('/evaluar/registrado', { state: { caseId: caseIdExistente, formularioCompleto: true } })
+        return
+      }
+
       const res = await fetch(`${API_URL}/requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -226,7 +250,7 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
       const newCaseId = json.caseId ?? null
       setCaseId(newCaseId)
       if (fromEvaluar) {
-        navigate('/evaluar/procesando', { state: { caseId: newCaseId } })
+        navigate('/evaluar/registrado', { state: { caseId: newCaseId } })
       } else {
         setSubmitSuccess(true)
       }
@@ -274,10 +298,10 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
   }
 
   return (
-    <div className="wizard">
-      <header className="wizard-header">
-        <Link to={fromEvaluar ? "/evaluar/tipo-caso" : "/"} className="wizard-back">← Volver</Link>
-        <h1>{fromEvaluar ? 'Evaluación de Evento Médico Adverso' : 'Consulta por mala praxis'}</h1>
+    <div className="wizard evaluar-flow mx-auto max-w-2xl px-4 py-12 md:py-16">
+      <header className="wizard-header mb-10">
+        <Link to={fromEvaluar ? "/evaluar/tipo-caso" : "/"} className="wizard-back text-sm font-medium text-primary hover:underline">← Volver</Link>
+        <h1 className="font-heading mt-4 text-3xl font-bold text-text">{fromEvaluar ? 'Evaluación de Evento Médico Adverso' : 'Consulta por mala praxis'}</h1>
         <div className="wizard-actions-top">
           <button type="button" className="wizard-btn secondary" onClick={handleLlenarTodo}>
             Llenar todo
@@ -312,11 +336,13 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
             {submitError}
           </div>
         )}
-        {/* FORM 1 - Identificación */}
+        {/* FORM 1 - Identificación (sin datos básicos si ya vienen del paso general) */}
         {step === 0 && (
           <div className="wizard-step">
-            <h2>Identificación del solicitante</h2>
-            <p className="wizard-step-desc">Datos de quién realiza la consulta.</p>
+            <h2 className="font-heading text-xl font-semibold text-text">{desdeRegistrado ? 'Rol del solicitante' : 'Identificación del solicitante'}</h2>
+            <p className="wizard-step-desc">
+              {desdeRegistrado ? 'Tu nombre, email y teléfono ya están registrados.' : 'Datos de quién realiza la consulta.'}
+            </p>
 
             <label>
               Rol del solicitante <span className="required">*</span>
@@ -348,66 +374,66 @@ export default function MalaPraxisWizard({ fromEvaluar = false }) {
               </label>
             )}
 
-            <label>
-              Nombre y apellido <span className="required">*</span>
-              <input
-                type="text"
-                value={data.nombre_completo}
-                onChange={(e) => update('nombre_completo', e.target.value)}
-                className={errors.nombre_completo ? 'error' : ''}
-              />
-              {errors.nombre_completo && <span className="field-error">{errors.nombre_completo}</span>}
-            </label>
-
-            <label>
-              DNI / Identificación <span className="required">*</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={data.documento}
-                onChange={(e) => update('documento', e.target.value.replaceAll(/\D/g, '').slice(0, 8))}
-                placeholder="7 u 8 dígitos"
-                className={errors.documento ? 'error' : ''}
-              />
-              {errors.documento && <span className="field-error">{errors.documento}</span>}
-            </label>
-
-            <label>
-              Email <span className="required">*</span>
-              <input
-                type="email"
-                value={data.email}
-                onChange={(e) => update('email', e.target.value)}
-                className={errors.email ? 'error' : ''}
-              />
-              {errors.email && <span className="field-error">{errors.email}</span>}
-            </label>
-
-            <label>
-              Teléfono <span className="required">*</span>
-              <input
-                type="tel"
-                value={data.telefono}
-                onChange={(e) => update('telefono', e.target.value)}
-                className={errors.telefono ? 'error' : ''}
-              />
-              {errors.telefono && <span className="field-error">{errors.telefono}</span>}
-            </label>
-
-            <label>
-              Provincia / País <span className="required">*</span>
-              <select
-                value={data.jurisdiccion}
-                onChange={(e) => update('jurisdiccion', e.target.value)}
-                className={errors.jurisdiccion ? 'error' : ''}
-              >
-                <option value="">Seleccione</option>
-                {PROVINCIAS.map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-              {errors.jurisdiccion && <span className="field-error">{errors.jurisdiccion}</span>}
-            </label>
+            {!desdeRegistrado && (
+              <>
+                <label>
+                  Nombre y apellido <span className="required">*</span>
+                  <input
+                    type="text"
+                    value={data.nombre_completo}
+                    onChange={(e) => update('nombre_completo', e.target.value)}
+                    className={errors.nombre_completo ? 'error' : ''}
+                  />
+                  {errors.nombre_completo && <span className="field-error">{errors.nombre_completo}</span>}
+                </label>
+                <label>
+                  DNI / Identificación <span className="required">*</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={data.documento}
+                    onChange={(e) => update('documento', e.target.value.replaceAll(/\D/g, '').slice(0, 8))}
+                    placeholder="7 u 8 dígitos"
+                    className={errors.documento ? 'error' : ''}
+                  />
+                  {errors.documento && <span className="field-error">{errors.documento}</span>}
+                </label>
+                <label>
+                  Email <span className="required">*</span>
+                  <input
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => update('email', e.target.value)}
+                    className={errors.email ? 'error' : ''}
+                  />
+                  {errors.email && <span className="field-error">{errors.email}</span>}
+                </label>
+                <label>
+                  Teléfono <span className="required">*</span>
+                  <input
+                    type="tel"
+                    value={data.telefono}
+                    onChange={(e) => update('telefono', e.target.value)}
+                    className={errors.telefono ? 'error' : ''}
+                  />
+                  {errors.telefono && <span className="field-error">{errors.telefono}</span>}
+                </label>
+                <label>
+                  Provincia / País <span className="required">*</span>
+                  <select
+                    value={data.jurisdiccion}
+                    onChange={(e) => update('jurisdiccion', e.target.value)}
+                    className={errors.jurisdiccion ? 'error' : ''}
+                  >
+                    <option value="">Seleccione</option>
+                    {PROVINCIAS.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                  {errors.jurisdiccion && <span className="field-error">{errors.jurisdiccion}</span>}
+                </label>
+              </>
+            )}
           </div>
         )}
 

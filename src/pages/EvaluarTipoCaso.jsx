@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-/**
- * Evaluación inicial (Anexo II) – Tipo de caso.
- * Deriva al anexo correspondiente: IV Amparos, V Evento médico adverso, VIII Reintegros, u Otro.
- */
 const TIPOS_CASO = [
   {
     id: 'prestacion_medica',
@@ -56,48 +52,57 @@ export default function EvaluarTipoCaso() {
   }
 
   return (
-    <div className="evaluar-welcome evaluar-tipo-caso">
-      <div className="evaluar-tipo-caso-inner">
-        <h1>Evaluación inicial</h1>
-        <p className="evaluar-tipo-caso-sub">Anexo II – Tipo de caso</p>
-        <p className="evaluar-welcome-desc">
-          Indicá qué tipo de situación tenés para derivar tu caso al módulo correspondiente.
-        </p>
+    <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
+      <h1 className="font-heading text-3xl font-bold text-text md:text-4xl">
+        Evaluación inicial
+      </h1>
+      <p className="mt-2 text-secondary font-medium">Anexo II – Tipo de caso</p>
+      <p className="mt-4 text-text/85">
+        Indicá qué tipo de situación tenés para derivar tu caso al módulo correspondiente.
+      </p>
 
-        <div className="evaluar-tipo-caso-options">
-          {TIPOS_CASO.map((op) => (
-            <label
-              key={op.id}
-              className={`evaluar-tipo-caso-card ${selected === op.id ? 'evaluar-tipo-caso-card--selected' : ''}`}
-            >
-              <input
-                type="radio"
-                name="tipo_caso"
-                value={op.id}
-                checked={selected === op.id}
-                onChange={() => setSelected(op.id)}
-                className="evaluar-oferta-radio"
-              />
-              <span className="evaluar-tipo-caso-label">{op.label}</span>
-              {op.anexoLabel && (
-                <span className="evaluar-tipo-caso-anexo">Anexo {op.anexo || '—'} · {op.anexoLabel}</span>
-              )}
-              <p className="evaluar-tipo-caso-desc">{op.desc}</p>
-            </label>
-          ))}
-        </div>
-
-        <div className="evaluar-tipo-caso-actions">
-          <button
-            type="button"
-            onClick={handleContinuar}
-            disabled={!selected}
-            className="evaluar-welcome-cta"
+      <div className="mt-10 space-y-4">
+        {TIPOS_CASO.map((op) => (
+          <label
+            key={op.id}
+            className={`flex cursor-pointer gap-4 rounded-2xl border-2 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all hover:shadow-[0_8px_24px_rgba(28,43,54,0.08)] ${
+              selected === op.id ? 'border-accent ring-2 ring-accent/20' : 'border-primary/15'
+            }`}
           >
-            Continuar
-          </button>
-          <Link to="/evaluar" className="evaluar-welcome-back">← Volver</Link>
-        </div>
+            <input
+              type="radio"
+              name="tipo_caso"
+              value={op.id}
+              checked={selected === op.id}
+              onChange={() => setSelected(op.id)}
+              className="mt-1 h-5 w-5 accent-accent"
+            />
+            <div className="flex-1">
+              <span className="font-heading text-lg font-semibold text-text">{op.label}</span>
+              {op.anexoLabel && (
+                <span className="ml-2 text-sm text-text/60">Anexo {op.anexo || '—'} · {op.anexoLabel}</span>
+              )}
+              <p className="mt-2 text-text/80">{op.desc}</p>
+            </div>
+          </label>
+        ))}
+      </div>
+
+      <div className="mt-10 flex flex-wrap gap-4">
+        <button
+          type="button"
+          onClick={handleContinuar}
+          disabled={!selected}
+          className="rounded-full bg-accent px-7 py-3.5 font-semibold text-primary transition hover:bg-accent/90 disabled:opacity-50"
+        >
+          Continuar
+        </button>
+        <Link
+          to="/evaluar"
+          className="rounded-full border-2 border-primary/30 px-7 py-3.5 font-semibold text-primary transition hover:border-primary hover:bg-primary/5"
+        >
+          ← Volver
+        </Link>
       </div>
     </div>
   )
