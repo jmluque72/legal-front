@@ -5,6 +5,15 @@ import Footer from '../components/Footer'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'))
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function CompletarSolicitud() {
   const { token } = useParams()
   const [loading, setLoading] = useState(true)
@@ -14,6 +23,8 @@ export default function CompletarSolicitud() {
   const [questions, setQuestions] = useState([])
   const [caseId, setCaseId] = useState('')
   const [answers, setAnswers] = useState({})
+  // Almacena objetos File separados para conversión a base64 en submit
+  const [fileValues, setFileValues] = useState({})
 
   useEffect(() => {
     if (!token) return
@@ -40,6 +51,17 @@ export default function CompletarSolicitud() {
   }, [token])
 
   const handleChange = (id, type, value) => {
+    if (type === 'file') {
+      const file = value // value es el objeto File
+      if (file) {
+        setFileValues((prev) => ({ ...prev, [id]: file }))
+        setAnswers((prev) => ({ ...prev, [id]: file.name }))
+      } else {
+        setFileValues((prev) => { const next = { ...prev }; delete next[id]; return next })
+        setAnswers((prev) => { const next = { ...prev }; delete next[id]; return next })
+      }
+      return
+    }
     let v = value
     if (type === 'number') {
       const n = Number(value)
@@ -54,10 +76,22 @@ export default function CompletarSolicitud() {
     setSubmitting(true)
     setError(null)
     try {
+      // Convertir archivos a base64 antes de enviar
+      const finalAnswers = { ...answers }
+      for (const [id, file] of Object.entries(fileValues)) {
+        try {
+          finalAnswers[id] = await fileToBase64(file)
+        } catch {
+          setError(`No se pudo procesar el archivo "${file.name}"`)
+          setSubmitting(false)
+          return
+        }
+      }
+
       const res = await fetch(`${API_URL}/data-requests/${encodeURIComponent(token)}/answers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers: finalAnswers }),
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -76,6 +110,24 @@ export default function CompletarSolicitud() {
     const commonClass =
       'mt-2 w-full rounded-xl border border-primary/20 bg-white px-4 py-3 text-text placeholder:text-text/50 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20'
     const value = answers[q.id] ?? ''
+
+    if (q.type === 'file') {
+      return (
+        <div className="mt-2">
+          <input
+            type="file"
+            accept="image/*,.pdf,.doc,.docx"
+            className="block w-full text-sm text-text/70 file:mr-3 file:rounded-full file:border-0 file:bg-accent/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-accent/20"
+            onChange={(e) => handleChange(q.id, 'file', e.target.files?.[0] ?? null)}
+          />
+          {fileValues[q.id] && (
+            <p className="mt-1 text-xs text-text/60">
+              Seleccionado: {fileValues[q.id].name} ({(fileValues[q.id].size / 1024).toFixed(0)} KB)
+            </p>
+          )}
+        </div>
+      )
+    }
 
     if (q.type === 'textarea') {
       return (
@@ -164,6 +216,9 @@ export default function CompletarSolicitud() {
                       {q.label}
                       {q.required && <span className="text-red-500"> *</span>}
                     </label>
+                    {q.type === 'file' && (
+                      <p className="mt-0.5 text-xs text-text/50">Formatos aceptados: imágenes, PDF, Word (máx. 10 MB)</p>
+                    )}
                     {renderField(q)}
                   </div>
                 ))}
@@ -186,4 +241,3 @@ export default function CompletarSolicitud() {
     </>
   )
 }
-

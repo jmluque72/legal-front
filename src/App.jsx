@@ -12,6 +12,10 @@ import EvaluarModalidad from './pages/EvaluarModalidad'
 import Terminos from './pages/Terminos'
 import Privacidad from './pages/Privacidad'
 import CompletarSolicitud from './pages/CompletarSolicitud'
+import PagoExitoso from './pages/PagoExitoso'
+import PagoPendiente from './pages/PagoPendiente'
+import PagoFallido from './pages/PagoFallido'
+import PagoLink from './pages/PagoLink'
 
 function App() {
   return (
@@ -20,6 +24,10 @@ function App() {
       <Route path="/terminos" element={<Terminos />} />
       <Route path="/privacidad" element={<Privacidad />} />
       <Route path="/completar/:token" element={<CompletarSolicitud />} />
+      <Route path="/pago/exitoso" element={<PagoExitoso />} />
+      <Route path="/pago/pendiente" element={<PagoPendiente />} />
+      <Route path="/pago/fallido" element={<PagoFallido />} />
+      <Route path="/pagar/:token" element={<PagoLink />} />
       <Route path="/evaluar" element={<EvaluarLayout />}>
         <Route index element={<EvaluarWelcome />} />
         <Route path="inicio" element={<EvaluarInicio />} />
