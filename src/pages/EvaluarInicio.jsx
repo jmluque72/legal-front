@@ -220,7 +220,7 @@ export default function EvaluarInicio() {
               value={data.descripcion_caso}
               onChange={(e) => update('descripcion_caso', e.target.value.slice(0, 5000))}
               className={`resize-none ${errors.descripcion_caso ? inputErrorClass : inputClass}`}
-              placeholder="Ej.: Me negaron una medicación que me recetó el médico, ya hice reclamo a la obra social sin respuesta…"
+              placeholder="Ej.: Me negaron una medicación que me recetó el médico… / Mi mamá está en un geriátrico y creemos que no la están cuidando bien… / Quiero pedir un reintegro de gastos que ya pagué…"
               rows={6}
               maxLength={5000}
             />

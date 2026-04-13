@@ -24,11 +24,25 @@ const TIPOS_CASO = [
     desc: 'Situación de riesgo vital que requiere cobertura urgente.',
   },
   {
+    id: 'biometria',
+    label: 'Datos biométricos / afiliación',
+    anexo: 'IV',
+    anexoLabel: 'Datos biométricos y afiliación',
+    desc: 'Registro de huella u otros datos biométricos, fallas de afiliación o cobertura vinculadas a esos datos.',
+  },
+  {
     id: 'evento_medico_adverso',
     label: 'Evento médico adverso',
     anexo: 'V',
     anexoLabel: 'Evaluación de evento médico adverso',
     desc: 'Quiero evaluar si hubo un error médico o resultado evitable (daño ya ocurrido).',
+  },
+  {
+    id: 'adultos_mayores',
+    label: 'Adulto mayor / persona en situación de vulnerabilidad',
+    anexo: 'VI',
+    anexoLabel: 'Adultos Mayores y Vulnerabilidad',
+    desc: 'Conflicto que involucra a una persona mayor de 65 años o en situación de dependencia, institucionalización o riesgo.',
   },
   {
     id: 'otro',

@@ -35,7 +35,7 @@ export default function EvaluarModalidad() {
   const location = useLocation()
   const caseId = location.state?.caseId ?? null
   const reportLevel = location.state?.reportLevel ?? null
-  const viabilidad = location.state?.viabilidad ?? 82
+  const viabilidad = location.state?.viabilidad ?? null
 
   const [modalidad, setModalidad] = useState(null)
   const [montoEstimado, setMontoEstimado] = useState(20000)
@@ -47,7 +47,7 @@ export default function EvaluarModalidad() {
   const [reportGenerated, setReportGenerated] = useState(null)
   const [reportLoading, setReportLoading] = useState(false)
 
-  const showMixto = viabilidad >= 60
+  const showMixto = (viabilidad ?? 0) >= 60
   const honorarioMixto = OPCIONES.find((o) => o.id === 'mixto')
   const totalMixto = honorarioMixto
     ? (honorarioMixto.anticipo || 0) + (montoEstimado * (honorarioMixto.successFee || 0)) / 100
@@ -174,6 +174,33 @@ export default function EvaluarModalidad() {
             Caso <strong>{caseId}</strong>{reportLevel && ` · Informe ${reportLevel}`}
           </p>
         )}
+
+        {/* Badge de viabilidad */}
+        {viabilidad !== null && (() => {
+          const color = viabilidad >= 80 ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : viabilidad >= 60 ? 'text-blue-700 bg-blue-50 border-blue-200'
+                      : viabilidad >= 40 ? 'text-amber-700 bg-amber-50 border-amber-200'
+                      : 'text-red-700 bg-red-50 border-red-200'
+          const label = viabilidad >= 80 ? 'Alta' : viabilidad >= 60 ? 'Media-Alta' : viabilidad >= 40 ? 'Media' : 'Baja'
+          const bar   = viabilidad >= 80 ? 'bg-emerald-500' : viabilidad >= 60 ? 'bg-blue-500' : viabilidad >= 40 ? 'bg-amber-500' : 'bg-red-500'
+          return (
+            <div className={`mt-5 inline-flex items-center gap-4 rounded-xl border px-5 py-3 ${color}`}>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-70">Viabilidad estimada del caso</p>
+                <p className="text-xs opacity-60 mt-0.5">Calculada sobre evaluación integral multidimensional</p>
+              </div>
+              <div className="text-right">
+                <span className="text-3xl font-bold tabular-nums">{viabilidad}%</span>
+                <p className="text-xs font-semibold">{label}</p>
+              </div>
+              <div className="w-20">
+                <div className="h-2 w-full rounded-full bg-white/50">
+                  <div className={`h-2 rounded-full ${bar}`} style={{ width: `${viabilidad}%` }} />
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           <div

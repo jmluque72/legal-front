@@ -44,6 +44,8 @@ export default function EvaluarRegistrado() {
     )
   }
 
+  const esAdultosMayores = tipologia === 'adultos_mayores' || anexo === 'VI'
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 md:py-24">
       <h1 className="font-heading text-3xl font-bold text-text md:text-4xl">
@@ -62,16 +64,22 @@ export default function EvaluarRegistrado() {
           Nº de caso: <strong>{caseId}</strong>
         </p>
       )}
-      <p className="mt-4 text-text/75">
-        Continuá con las preguntas del anexo para completar la evaluación.
-      </p>
+      {esAdultosMayores ? (
+        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 leading-relaxed">
+          Este módulo activa una <strong>evaluación reforzada</strong>. Las preguntas del siguiente paso nos permiten entender la situación de la persona y garantizar un abordaje ético y adecuado. No son un diagnóstico médico ni legal.
+        </div>
+      ) : (
+        <p className="mt-4 text-text/75">
+          Continuá con las preguntas del anexo para completar la evaluación.
+        </p>
+      )}
       <div className="mt-10 flex flex-wrap gap-4">
         <button
           type="button"
           onClick={continuarFlujo}
           className="rounded-full bg-accent px-7 py-3.5 font-semibold text-primary transition hover:bg-accent/90"
         >
-          Continuar con las preguntas del anexo
+          {esAdultosMayores ? 'Completar evaluación reforzada →' : 'Continuar con las preguntas del anexo'}
         </button>
         <Link
           to="/"
