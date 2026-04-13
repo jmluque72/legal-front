@@ -10,6 +10,7 @@ import AdultosMayoresWizard from './AdultosMayoresWizard'
  * - Anexo VI o tipología adultos_mayores → wizard Adultos Mayores (Anexo VI).
  * - Anexo VIII o tipología reintegro → wizard reintegros (Anexo VIII).
  * - Tipología biometria → wizard datos biométricos (Anexo IV).
+ * - Anexo VII o tipología segunda_opinion → formulario reducido (Anexo VII).
  * - Anexo V o sin state → evento médico adverso (legacy si no hay state).
  * - Resto → formulario reducido.
  */
@@ -28,6 +29,10 @@ export default function EvaluarCasoRouter() {
 
   if (tipologia === 'biometria') {
     return <BiometriaWizard fromEvaluar />
+  }
+
+  if (anexo === 'VII' || tipologia === 'segunda_opinion') {
+    return <EvaluacionOtroAnexo />
   }
 
   if (anexo === 'V' || anexo === undefined) {

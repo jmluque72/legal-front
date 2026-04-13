@@ -45,6 +45,13 @@ const TIPOS_CASO = [
     desc: 'Conflicto que involucra a una persona mayor de 65 años o en situación de dependencia, institucionalización o riesgo.',
   },
   {
+    id: 'segunda_opinion',
+    label: 'Segunda opinión médico-legal',
+    anexo: 'VII',
+    anexoLabel: 'Segunda opinión médico-legal',
+    desc: 'Quiero saber si hubo un error, revisar un diagnóstico o evaluar si tengo caso legal, sin que haya una negativa de cobertura de por medio.',
+  },
+  {
     id: 'otro',
     label: 'Otro',
     anexo: null,
