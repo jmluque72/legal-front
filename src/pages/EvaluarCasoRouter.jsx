@@ -4,6 +4,8 @@ import EvaluacionOtroAnexo from './EvaluacionOtroAnexo'
 import ReintegroAnexoVIIIWizard from './ReintegroAnexoVIIIWizard'
 import BiometriaWizard from './BiometriaWizard'
 import AdultosMayoresWizard from './AdultosMayoresWizard'
+import SaludMentalWizard from './SaludMentalWizard'
+import CaisWizard from './CaisWizard'
 
 /**
  * Deriva por anexo / tipología:
@@ -29,6 +31,14 @@ export default function EvaluarCasoRouter() {
 
   if (tipologia === 'biometria') {
     return <BiometriaWizard fromEvaluar />
+  }
+
+  if (tipologia === 'salud_mental') {
+    return <SaludMentalWizard fromEvaluar />
+  }
+
+  if (tipologia === 'cais' || anexo === 'III') {
+    return <CaisWizard fromEvaluar />
   }
 
   if (anexo === 'VII' || tipologia === 'segunda_opinion') {

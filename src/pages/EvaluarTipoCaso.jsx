@@ -52,6 +52,20 @@ const TIPOS_CASO = [
     desc: 'Quiero saber si hubo un error, revisar un diagnóstico o evaluar si tengo caso legal, sin que haya una negativa de cobertura de por medio.',
   },
   {
+    id: 'salud_mental',
+    label: 'Salud mental',
+    anexo: null,
+    anexoLabel: 'Salud mental y capacidad',
+    desc: 'Internación involuntaria, derechos del paciente psiquiátrico, capacidad restringida, curatela por salud mental.',
+  },
+  {
+    id: 'cais',
+    label: 'Caso de alto impacto sanitario (CAIS)',
+    anexo: 'III',
+    anexoLabel: 'Alto impacto — Módulo M7',
+    desc: 'Situación grave con múltiples afectados, falla institucional sistémica, daño colectivo o riesgo vital inmediato. Requiere intervención urgente y asignación a abogado experto.',
+  },
+  {
     id: 'otro',
     label: 'Otro',
     anexo: null,
